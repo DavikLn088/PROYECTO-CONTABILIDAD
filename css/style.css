@@ -1,3 +1,12 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: sans-serif;
+}
+
+
 body {
     background: linear-gradient(to bottom, #000000, #FFFFFF);
     display: flex;
