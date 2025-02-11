@@ -22,14 +22,16 @@
                     <button id="btn__registrarse">Registrarse</button>
                 </div>
             </div>
+            <!--Formulario de Login y Registro-->
             <div class="contenedor__login-register">
-                <form action="" class="formulario__login">
+                <!--Login-->
+                <form action="./php/login_usuario_be.php" method="POST" class="formulario__login">
                     <h2>Iniciar Sesión</h2>
-                    <input type="text" placeholder="Correo Electrónico">
-                    <input type="password" placeholder="Contraseña">
+                    <input type="text" placeholder="Correo Electrónico" name="correo"> 
+                    <input type="password" placeholder="Contraseña" name="contrasena">
                     <button>Entrar</button>
                 </form>
-   
+                <!--Register-->
             <form action="./php/registro_usuario_be.php" method="POST" class="formulario__register">
                     <h2>Registrarse</h2>
                     <input type="text" placeholder="Nombre Completo" name="nombre_completo">
