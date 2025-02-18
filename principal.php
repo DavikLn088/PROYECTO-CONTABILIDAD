@@ -22,6 +22,6 @@
 </head>
 <body>
     <h1>Bienvenido a la página principal</h1>
-    <a href=".php/cerrar_sesion.php">Cerrar sesion</a>
+    <a href="./php/cerrar_sesion.php">Cerrar sesion</a>
 </body>
 </html>
