@@ -14,7 +14,6 @@ body {
     background-attachment: fixed;
 }
 
-
 main{
     width: 100%;
     padding: 20px;
@@ -36,18 +35,4 @@ main{
     justify-content: center;
     backdrop-filter: blur(10px);
     background-color: rgba(0, 128, 255, 0.5);
-}
-
-.cerrar_sesion{
-    width: 100%;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-    background-color: rgba(0, 128, 255, 0.5);
-}
-
-.btn_cerrar_sesion{
-    margin-top: 30px;
-
 }
