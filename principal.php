@@ -1,117 +1,85 @@
 <?php
-    // Inicia la sesión
-    session_start();
+session_start();
 
-    // Verifica si el usuario ha iniciado sesión
-    if(!isset($_SESSION['usuario'])){
-        echo '<script>
-                alert("Por favor debes iniciar sesión");
-                window.location = "index.php";
-              </script>';
-        session_destroy();
-        die();
-    }
+if (!isset($_SESSION['correo'])) {
+    echo '<script>
+            alert("Por favor debes iniciar sesión");
+            window.location = "index.php";
+          </script>';
+    session_destroy();
+    die();
+}
 
-    // Inicializa las variables de error y datos del formulario
-    $mensajeError = "";
-    $nombre = "";
-    $apellido = "";
-    
-    // Verifica si el formulario ha sido enviado
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        // Obtiene los datos del formulario y los asigna a variables
-        $nombre = $_POST['nombre'] ?? '';
-        $apellido = $_POST['apellido'] ?? '';
-        $sueldo = $_POST['sueldo'] ?? '';
-        $bonificacion = $_POST['bonificacion'] ?? '';
-        $horasExtras = $_POST['horas_extras'] ?? '';
-        $prestamoIESS = $_POST['prestamo_iess'] ?? '';
-        $impuestoRenta = $_POST['impuesto_renta'] ?? '';
-        $comisariato = $_POST['comisariato'] ?? '';
+$nombre = $_POST['nombre'] ?? '';
+$apellido = $_POST['apellido'] ?? '';
+$cargo = $_POST['cargo'] ?? '';
+$sueldo = $_POST['sueldo'] ?? 0;
+$bonificacion = $_POST['bonificacion'] ?? 0;
+$transporte = $_POST['transporte'] ?? 0;
+$alimentacion = $_POST['alimentacion'] ?? 0;
+$horasExtras = $_POST['horas_extras'] ?? 0;
+$prestamoIESS = $_POST['prestamo_iess'] ?? 0;
+$impuestoRenta = $_POST['impuesto_renta'] ?? 0;
+$seguroPrivado = $_POST['seguro_privado'] ?? 0;
+$comisariato = $_POST['comisariato'] ?? 0;
+$salarioBasico = 450;
+if ($salarioBasico < 470) {
+    echo '<script>alert("El salario básico no puede ser menor a $470.");</script>';
+    $salarioBasico = 470;
+}
+$aporteIESS = calcularAporteIESS($sueldo);
 
-        // Verifica si todos los campos han sido llenados
-        if (empty($nombre) || empty($apellido) || empty($sueldo) || empty($bonificacion) || empty($horasExtras) || empty($prestamoIESS) || empty($impuestoRenta) || empty($comisariato)) {
-            $mensajeError = "Por favor, llene todos los campos antes de continuar.";
-        } else {
-            // Calcula el aporte al IESS y los ingresos y egresos totales
-            $aporteIESS = $sueldo * 0.0945;
-            $totalIngresos = $sueldo + $bonificacion + $horasExtras + ($sueldo * 0.0833333) + ($sueldo / 12) + (($sueldo * 12) / 12);
-            $totalEgresos = $aporteIESS + $prestamoIESS + $impuestoRenta + $comisariato;
-            $liquidoPagar = $totalIngresos - $totalEgresos;
-        }
-    }
+$totalIngresos = calcularTotalIngresos($sueldo, $bonificacion, $transporte, $alimentacion, $horasExtras, $salarioBasico);
+$totalEgresos = calcularTotalEgresos($aporteIESS, $prestamoIESS, $impuestoRenta, $seguroPrivado, $comisariato);
+$liquidoPagar = calcularLiquidoPagar($totalIngresos, $totalEgresos);
 
-    // Función para calcular el décimo tercer sueldo
-    function calcularDecimoTercerSueldo($sueldo) {
-        return $sueldo;
-    }
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['descargar'])) {
+    $nombre = $_POST['nombre'] ?? 'N/A';
+    $apellido = $_POST['apellido'] ?? 'N/A';
+    $cargo = $_POST['cargo'] ?? 'N/A';
+    $sueldo = $_POST['sueldo'] ?? 0;
+    $totalIngresos = $_POST['totalIngresos'] ?? 0;
+    $totalEgresos = $_POST['totalEgresos'] ?? 0;
+    $liquidoPagar = $_POST['liquidoPagar'] ?? 0;
 
-    // Función para calcular el décimo cuarto sueldo
-    function calcularDecimoCuartoSueldo($salarioBasico) {
-        return $salarioBasico / 12;
-    }
+    $archivo = "reporte.txt";
+    $contenido = "Nombre: $nombre $apellido\n";
+    $contenido .= "Cargo: $cargo\n";
+    $contenido .= "Sueldo: $$sueldo\n";
+    $contenido .= "Total Ingresos: $$totalIngresos\n";
+    $contenido .= "Total Egresos: $$totalEgresos\n";
+    $contenido .= "Líquido a Pagar: $$liquidoPagar\n";
 
-    // Función para calcular los fondos de reserva
-    function calcularFondosReserva($sueldo) {
-        return $sueldo * 0.0833333;
-    }
+    file_put_contents($archivo, $contenido);
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename=' . $archivo);
+    readfile($archivo);
+    exit;
+}
 
-    // Función para calcular el valor de las horas extras
-    function calcularHorasExtras($sueldo, $horasExtras) {
-        $valorHora = ($sueldo / 240) * 2;
-        return $horasExtras * $valorHora;
-    }
-
-    // Función para calcular los ingresos totales
-    function calcularTotalIngresos($sueldo, $bonificacion, $horasExtras, $salarioBasico) {
-        $decimoTercero = calcularDecimoTercerSueldo($sueldo);
-        $decimoCuarto = calcularDecimoCuartoSueldo($salarioBasico);
-        $fondosReserva = calcularFondosReserva($sueldo);
-        $extraHoras = calcularHorasExtras($sueldo, $horasExtras);
-        return $sueldo + $bonificacion + $extraHoras + $decimoTercero + $decimoCuarto + $fondosReserva;
-    }
-
-    // Función para calcular los egresos totales
-    function calcularTotalEgresos($aporteIESS, $prestamoIESS, $impuestoRenta, $comisariato) {
-        return $aporteIESS + $prestamoIESS + $impuestoRenta + $comisariato;
-    }
-
-     
-    // Función para calcular el líquido a pagar
-    function calcularLiquidoPagar($totalIngresos, $totalEgresos) {
-        return $totalIngresos - $totalEgresos;
-    }
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $sueldo = $_POST['sueldo'];
-        $bonificacion = $_POST['bonificacion'] ?? 0;
-        $horasExtras = $_POST['horas_extras'] ?? 0;
-        $prestamoIESS = $_POST['prestamo_iess'] ?? 0;
-        $impuestoRenta = $_POST['impuesto_renta'] ?? 0;
-        $comisariato = $_POST['comisariato'] ?? 0;
-        $salarioBasico = 450;
-        $aporteIESS = $sueldo * 0.0945;
-        
-        $totalIngresos = calcularTotalIngresos($sueldo, $bonificacion, $horasExtras, $salarioBasico);
-        $totalEgresos = calcularTotalEgresos($aporteIESS, $prestamoIESS, $impuestoRenta, $comisariato);
-        $liquidoPagar = calcularLiquidoPagar($totalIngresos, $totalEgresos);
-        }
-        function generarArchivoTxt($nombre, $apellido, $totalIngresos, $totalEgresos, $liquidoPagar) {
-            $contenido = "Empleado: $nombre $apellido\n";
-            $contenido .= "Total Ingresos: $$totalIngresos\n";
-            $contenido .= "Total Egresos: $$totalEgresos\n";
-            $contenido .= "Líquido a Pagar: $$liquidoPagar\n";
-
-        $archivo = "reporte_rol_pagos.txt";
-        file_put_contents($archivo, $contenido);
-        header('Content-Disposition: attachment; filename="' . $archivo . '"');
-        readfile($archivo);
-        exit;
-    }
-
-
-// Si se presiona el botón de "descargar", se genera un archivo de texto con los datos del usuario.
-if (isset($_POST['descargar'])) {
-    generarArchivoTxt($nombre, $apellido, $totalIngresos, $totalEgresos, $liquidoPagar);
+function calcularDecimoTercero($sueldo) {
+    return $sueldo / 12;
+}
+function calcularDecimoCuarto($salarioBasico) {
+    return $salarioBasico / 12;
+}
+function calcularFondosReserva($sueldo) {
+    return $sueldo * 0.0833333;
+}
+function calcularHorasExtras($sueldo, $horasExtras) {
+    return ($sueldo / 240) * 2 * $horasExtras;
+}
+function calcularAporteIESS($sueldo) {
+    return $sueldo * 0.0945;
+}
+function calcularTotalIngresos($sueldo, $bonificacion, $transporte, $alimentacion, $horasExtras, $salarioBasico) {
+    return $sueldo + $bonificacion + $transporte + $alimentacion + calcularDecimoTercero($sueldo) + calcularDecimoCuarto($salarioBasico) + calcularFondosReserva($sueldo) + calcularHorasExtras($sueldo, $horasExtras);
+}
+function calcularTotalEgresos($aporteIESS, $prestamoIESS, $impuestoRenta, $seguroPrivado, $comisariato) {
+    return $aporteIESS + $prestamoIESS + $impuestoRenta + $seguroPrivado + $comisariato;
+}
+function calcularLiquidoPagar($totalIngresos, $totalEgresos) {
+    return $totalIngresos - $totalEgresos;
 }
 ?>
 
@@ -123,241 +91,111 @@ if (isset($_POST['descargar'])) {
     <title>Rol de Pagos</title>
     <link rel="stylesheet" href="./css/style_principal.css">
     <style>
-    /* General */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif; /* Fuente más legible */
-}   
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-    main {
-        width: 100%;
-        padding: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
+        body {
+            background: url('fondo.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-    .contenedor__todo {
-        width: 100%;
-        max-width: 800px;
-        margin: auto;
-        position: relative;
-    }
+        .contenedor {
+            background: rgba(0, 102, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 400px;
+            color: white;
+        }
 
-    form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-    align-items: center;
-}
+        h2 {
+            margin-bottom: 20px;
+        }
 
-    input, button {
-        padding: 10px;
-        border-radius: 5px;
-        border: none;
-        width: 80%;
-    }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+        }
 
-    button {
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
-    }
+        input {
+            background: white;
+            color: black;
+        }
 
-    button:hover {
-        background-color: #0056b3;
-    }
+        button {
+            background-color: #0056b3;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-    .contenedor {
-    max-width: 600px;
-    margin: 50px auto;
-    text-align: center;
-    color: #fff; /* Letras blancas para contraste */
-}
-h2 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #f1f1f1;
-}
+        button:hover {
+            background-color: #003d80;
+        }
 
-h3 {
-    font-size: 20px;
-    font-weight: normal;
-    margin-bottom: 15px;
-}
-
-label {
-    font-size: 18px;
-    font-weight: bold;
-    color: #f1f1f1;
-    display: block;
-    text-align: left;
-    width: 80%;
-}
-input {
-    padding: 12px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 80%;
-    font-size: 16px;
-}
-
-    .cuadro-resultados {
-        border: 2px solid #000;
-        padding: 20px;
-        margin-top: 20px;
-        font-size: 20px;
-        background-color: #f9f9f9;
-    }
-
-    .caja__trasera_rol, .cerrar_sesion {
-    width: 100%;
-    padding: 10px 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(2px);
-    background-color: rgba(9, 50, 92, 0.5);
-    flex-direction: column;
-    }
-
-    .menu_principal,
-.cerrar_sesion {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-.menu_principal button,
-.cerrar_sesion button {
-    width: 80%;
-    text-align: center;
-}
-
-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-
-button a {
-    color: white;
-    text-decoration: none;
-}
-
-button:hover {
-    background-color: #0056b3; /* Azul más oscuro */
-    transform: scale(1.05);
-}
-
-.error {
-    color: red;
-}
-html, body {
-    scroll-behavior: smooth; /* Suaviza el scroll en todos los navegadores */
-    margin: 0;
-    padding: 0;
-}
+        a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-<div class="section" id="inicio">Inicio</div>
-<div class="section" id="medio">Sección del Medio</div>
-<div class="section" id="final">Final</div>
-
-<div class="buttons">
-    <button onclick="scrollToTop()">Ir arriba</button>
-    <button onclick="scrollToElement('medio')">Ir al Medio</button>
-    <button onclick="scrollToBottom()">Ir abajo</button>
-</div>
-
-<script>
-    function scrollToElement(elementId) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    }
-
-    function scrollToTop() {
-        // Usa scrollIntoView para ir al principio de la página
-        const inicio = document.getElementById('inicio');
-        if (inicio) {
-            inicio.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    }
-
-    function scrollToBottom() {
-        // Hacer scroll hasta el final
-        const final = document.getElementById('final');
-        if (final) {
-            final.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
-    }
-</script>
-
-    <div class="contenedor">
-        <h2>Bienvenido, <?php echo $_SESSION['usuario']; ?>!</h2>
-        <h3>Ingrese sus datos</h3>
-        <?php if ($mensajeError) echo "<p class='error'>$mensajeError</p>"; ?>
-        <form method="POST">
-            <label>Nombre:</label>
-            <input type="text" name="nombre" required value="<?php echo $nombre; ?>">
-            <label>Apellido:</label>
-            <input type="text" name="apellido" required value="<?php echo $apellido; ?>">
-            <label>Sueldo:</label>
-            <input type="number" name="sueldo" required>
-            <label>Bonificación o Comisión:</label>
-            <input type="number" name="bonificacion" required>
-            <label>Horas Extras:</label>
-            <input type="number" name="horas_extras" required>
-            <label>Préstamo IESS:</label>
-            <input type="number" name="prestamo_iess" required>
-            <label>Impuesto a la Renta:</label>
-            <input type="number" name="impuesto_renta" required>
-            <label>Comisariato:</label>
-            <input type="number" name="comisariato" required>
+<div class="contenedor">
+    <h2>Bienvenido, usuario!</h2>
+    <form method="POST">
+            <input type="text" name="nombre" placeholder="Nombre" required>
+            <input type="text" name="apellido" placeholder="Apellido" required>
+            <input type="text" name="cargo" placeholder="Cargo" required>
+            <input type="number" name="sueldo" placeholder="Sueldo" required>
+            <input type="number" name="bonificacion" placeholder="Bonificación">
+            <input type="number" name="transporte" placeholder="Transporte">
+            <input type="number" name="alimentacion" placeholder="Alimentación">
+            <input type="number" name="horas_extras" placeholder="Horas Extras">
+            <input type="number" name="prestamo_iess" placeholder="Préstamo IESS">
+            <input type="number" name="impuesto_renta" placeholder="Impuesto a la Renta">
+            <input type="number" name="seguro_privado" placeholder="Seguro Privado">
+            <input type="number" name="comisariato" placeholder="Comisariato">
             <button type="submit">Calcular</button>
-            <button type="reset">Refrescar</button>
         </form>
-        <?php if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$mensajeError): ?>
-            <div class="cuadro-resultados">
-                <h3>Resultados</h3>
-                <p>Empleado: <?php echo "$nombre $apellido"; ?></p>
-                <p>Total Ingresos: $<?php echo number_format($totalIngresos, 2); ?></p>
-                <p>Total Egresos: $<?php echo number_format($totalEgresos, 2); ?></p>
-                <p>Líquido a Pagar: $<?php echo number_format($liquidoPagar, 2); ?></p>
-                <form method="POST">
-                    <input type="hidden" name="descargar" value="1">
-                    <button type="submit">Descargar en TXT</button>
-                </form>
-                </div>
-                    <?php endif; ?>
-            </div>
-            <div class="menu_principal">
-    <button class="btn_menu_principal">
-        <a href="menu_principal.php">Volver al Menú Principal</a>
-    </button>
-</div>
+        <?php if ($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
+    <div class="cuadro-resultados">
+        <p><strong>Nombre:</strong> <?php echo $nombre . " " . $apellido; ?></p>
+        <p><strong>Cargo:</strong> <?php echo $cargo; ?></p>
+        <p><strong>Sueldo:</strong> <?php echo $sueldo; ?></p>
+        <p><strong>Total Ingresos:</strong> <?php echo $totalIngresos; ?></p>
+        <p><strong>Total Egresos:</strong> <?php echo $totalEgresos; ?></p>
+        <p><strong>Líquido a Pagar:</strong> <?php echo $liquidoPagar; ?></p>
+    </div>
+    <form method="POST" action="">
+    <input type="hidden" name="nombre" value="<?php echo htmlspecialchars($nombre); ?>">
+    <input type="hidden" name="apellido" value="<?php echo htmlspecialchars($apellido); ?>">
+    <input type="hidden" name="cargo" value="<?php echo htmlspecialchars($cargo); ?>">
+    <input type="hidden" name="sueldo" value="<?php echo htmlspecialchars($sueldo); ?>">
+    <input type="hidden" name="totalIngresos" value="<?php echo htmlspecialchars($totalIngresos); ?>">
+    <input type="hidden" name="totalEgresos" value="<?php echo htmlspecialchars($totalEgresos); ?>">
+    <input type="hidden" name="liquidoPagar" value="<?php echo htmlspecialchars($liquidoPagar); ?>">
+    <input type="hidden" name="descargar" value="1">
+    <button type="submit">Descargar en TXT</button>
+</form>
 
-<div class="cerrar_sesion">
-    <button class="btn_cerrar_sesion">
-        <a href="./php/cerrar_sesion.php">Cerrar sesión</a>
-    </button>
-</div>
-            </div>
-        </div>
-    </main>
+
+    <?php endif; ?>
+    <button><a href="menu_principal.php">Volver al Menú Principal</a></button>
+        <button><a href="./php/cerrar_sesion.php">Cerrar sesión</a></button>
+    </div>
 </body>
 </html>
-
