@@ -10,7 +10,7 @@
     contrasena='$contrasena'");
     if(mysqli_num_rows($validar_login) > 0){
         $_SESSION['usuario'] = $correo;
-        header("location: ../principal.php");
+        header("location: ../menu_principal.php");
         exit;
     }else{
         echo '

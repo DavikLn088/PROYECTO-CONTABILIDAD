@@ -185,7 +185,12 @@
     .btn_cerrar_sesion {
         margin-top: 5px;
     }
+    
+    .btn_menu_principal {
 
+        margin-top: 5px;
+    }
+       
     .error {
         color: red;
     }
@@ -230,6 +235,9 @@
                 </div>
                     <?php endif; ?>
             </div>
+            <div class="menu_principal">
+                <button id="btn_menu_principal"><a href="menu_principal.php">Volver al Menú Principal</a></button>
+
             <div class="cerrar_sesion">
                 <button id="btn_cerrar_sesion"><a href="./php/cerrar_sesion.php">Cerrar sesión</a></button>
             </div>
@@ -237,3 +245,4 @@
     </main>
 </body>
 </html>
+
