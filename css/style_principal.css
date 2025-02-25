@@ -54,3 +54,10 @@ main {
     background-color: rgba(0, 128, 255, 0.5);
 }
 
+
+.contenedor {
+    background-color: rgba(0, 102, 255, 0.5); /* Color azul con transparencia */
+    backdrop-filter: blur(10px); /* Aplica el difuminado */
+    padding: 20px;
+    border-radius: 10px; /* Bordes redondeados */
+}
