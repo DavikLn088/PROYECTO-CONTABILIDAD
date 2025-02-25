@@ -23,10 +23,6 @@ $impuestoRenta = $_POST['impuesto_renta'] ?? 0;
 $seguroPrivado = $_POST['seguro_privado'] ?? 0;
 $comisariato = $_POST['comisariato'] ?? 0;
 $salarioBasico = 450;
-if ($salarioBasico < 470) {
-    echo '<script>alert("El salario básico no puede ser menor a $470.");</script>';
-    $salarioBasico = 470;
-}
 $aporteIESS = calcularAporteIESS($sueldo);
 
 $totalIngresos = calcularTotalIngresos($sueldo, $bonificacion, $transporte, $alimentacion, $horasExtras, $salarioBasico);
