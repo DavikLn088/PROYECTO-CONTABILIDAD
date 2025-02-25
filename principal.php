@@ -272,32 +272,40 @@ html, body {
 </head>
 <body>
 <div class="section" id="inicio">Inicio</div>
-    <div class="section" id="medio">Sección del Medio</div>
-    <div class="section" id="final">Final</div>
+<div class="section" id="medio">Sección del Medio</div>
+<div class="section" id="final">Final</div>
 
-    <div class="buttons">
-        <button onclick="scrollToTop()">Ir arriba</button>
-        <button onclick="scrollToElement('medio')">Ir al Medio</button>
-        <button onclick="scrollToBottom()">Ir abajo</button>
-    </div>
+<div class="buttons">
+    <button onclick="scrollToTop()">Ir arriba</button>
+    <button onclick="scrollToElement('medio')">Ir al Medio</button>
+    <button onclick="scrollToBottom()">Ir abajo</button>
+</div>
 
-    <script>
-        function scrollToElement(elementId) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
+<script>
+    function scrollToElement(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-
-        function scrollToTop() {
-        document.documentElement.scrollTop = 0; // Para navegadores modernos
-        document.body.scrollTop = 0; // Para navegadores más antiguos
     }
 
-        function scrollToBottom() {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    function scrollToTop() {
+        // Usa scrollIntoView para ir al principio de la página
+        const inicio = document.getElementById('inicio');
+        if (inicio) {
+            inicio.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-    </script>
+    }
+
+    function scrollToBottom() {
+        // Hacer scroll hasta el final
+        const final = document.getElementById('final');
+        if (final) {
+            final.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+    }
+</script>
+
     <div class="contenedor">
         <h2>Bienvenido, <?php echo $_SESSION['usuario']; ?>!</h2>
         <h3>Ingrese sus datos</h3>
