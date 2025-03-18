@@ -16,11 +16,21 @@ if (!isset($_SESSION['correo'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú Principal</title>
     <style>
+
+.background_image{
+
+
+
+}
 body {
     font-family: Arial, sans-serif;
     text-align: center;
     background-color: #f4f4f4;
     background-image: url(./images/fondo_de_pantalla.jpeg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
     padding: 20px;
 }
 
