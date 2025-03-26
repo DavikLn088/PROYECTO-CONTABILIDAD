@@ -1,14 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['correo'])) {
-    echo '<script>
-            alert("Por favor debes iniciar sesión");
-            window.location = "index.php";
-          </script>';
-    session_destroy();
-    die();
-}
+
 
 $nombre = $_POST['nombre'] ?? '';
 $apellido = $_POST['apellido'] ?? '';

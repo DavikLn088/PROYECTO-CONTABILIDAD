@@ -223,9 +223,9 @@ $conexion->close();
             <button type="button" class="btn" id="addProductBtn">Añadir Producto</button>
 
             <div class="total-section">
-                <div>Subtotal 12%: <span id="subtotal12">$0.00</span></div>
+                <div>Subtotal 15%: <span id="subtotal15">$0.00</span></div>
                 <div>Subtotal 0%: <span id="subtotal0">$0.00</span></div>
-                <div>IVA 12%: <span id="iva">$0.00</span></div>
+                <div>IVA 15%: <span id="iva">$0.00</span></div>
                 <div>Total: <span id="total">$0.00</span></div>
             </div>
 
@@ -261,7 +261,7 @@ $conexion->close();
                             <td><?= htmlspecialchars($producto['codigo']) ?></td>
                             <td><?= htmlspecialchars($producto['descripcion']) ?></td>
                             <td>$<?= number_format($producto['precio'], 2) ?></td>
-                            <td><?= $producto['iva'] == 1 ? '12%' : '0%' ?></td>
+                            <td><?= $producto['iva'] == 1 ? '15%' : '0%' ?></td>
                             <td><button type="button" onclick="selectProduct(<?= htmlspecialchars(json_encode($producto)) ?>)" class="btn">Seleccionar</button></td>
                         </tr>
                     <?php endforeach; ?>
@@ -301,7 +301,7 @@ $conexion->close();
             const tbody = document.getElementById('itemsBody');
             tbody.innerHTML = '';
             
-            let subtotal12 = 0;
+            let subtotal15 = 0;
             let subtotal0 = 0;
             let iva = 0;
             
@@ -309,8 +309,8 @@ $conexion->close();
                 const subtotalItem = item.cantidad * item.precio * (1 - item.descuento/100);
                 
                 if (item.iva == 1) {
-                    subtotal12 += subtotalItem;
-                    iva += subtotalItem * 0.12;
+                    subtotal15 += subtotalItem;
+                    iva += subtotalItem * 0.15;
                 } else {
                     subtotal0 += subtotalItem;
                 }
@@ -329,10 +329,10 @@ $conexion->close();
             });
             
             // Actualizar totales
-            document.getElementById('subtotal12').textContent = `$${subtotal12.toFixed(2)}`;
+            document.getElementById('subtotal15').textContent = `$${subtotal15.toFixed(2)}`;
             document.getElementById('subtotal0').textContent = `$${subtotal0.toFixed(2)}`;
             document.getElementById('iva').textContent = `$${iva.toFixed(2)}`;
-            document.getElementById('total').textContent = `$${(subtotal12 + subtotal0 + iva).toFixed(2)}`;
+            document.getElementById('total').textContent = `$${(subtotal15 + subtotal0 + iva).toFixed(2)}`;
         }
         
         // Función para actualizar un item

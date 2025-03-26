@@ -1,6 +1,0 @@
-Nombre: Jeremy Burgos
-Cargo: Comerciante
-Sueldo: $500
-Total Ingresos: $732.16665
-Total Egresos: $869.25
-Líquido a Pagar: $-137.08335
