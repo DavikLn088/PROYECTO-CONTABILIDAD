@@ -1,27 +1,32 @@
 <?php
 // facturacion.php
-require_once './php/config.php';
-
-// Obtener datos de la empresa (asumiendo que ya está registrada)
 session_start();
-$empresa_id = $_SESSION['empresa_id'] ?? null;
 
-if (!$empresa_id) {
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['empresa_id'])) {
+    $_SESSION['error_message'] = 'Debe iniciar sesión y seleccionar una empresa';
     header('Location: index.php');
     exit;
 }
 
-// Obtener información de la empresa
-$conexion = conectarDB();
-$sql_empresa = "SELECT * FROM empresas WHERE id = ?";
-$stmt_empresa = $conexion->prepare($sql_empresa);
-$stmt_empresa->bind_param("i", $empresa_id);
-$stmt_empresa->execute();
-$empresa = $stmt_empresa->get_result()->fetch_assoc();
-$stmt_empresa->close();
+require_once './php/config.php';
 
-// Procesar el formulario de facturación si se envió
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+try {
+    // Obtener conexión PDO
+    $pdo = conectarDB();
+    
+    // Obtener datos de la empresa
+    $empresa_id = $_SESSION['empresa_id'];
+    $sql_empresa = "SELECT * FROM empresas WHERE id = ?";
+    $stmt_empresa = $pdo->prepare($sql_empresa);
+    $stmt_empresa->execute([$empresa_id]);
+    $empresa = $stmt_empresa->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$empresa) {
+        throw new Exception("Empresa no encontrada");
+    }
+
+    // Procesar el formulario de facturación si se envió
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Aquí iría el código para procesar la factura
     // ...
     
@@ -31,23 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Obtener datos para el formulario (clientes, productos, etc.)
+// Obtener clientes (usando PDO)
 $sql_clientes = "SELECT * FROM clientes WHERE empresa_id = ?";
-$stmt_clientes = $conexion->prepare($sql_clientes);
-$stmt_clientes->bind_param("i", $empresa_id);
-$stmt_clientes->execute();
-$clientes = $stmt_clientes->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt_clientes->close();
+$stmt_clientes = $pdo->prepare($sql_clientes);
+$stmt_clientes->execute([$empresa_id]);
+$clientes = $stmt_clientes->fetchAll(PDO::FETCH_ASSOC);
 
+// Obtener productos (usando PDO)
 $sql_productos = "SELECT * FROM productos WHERE empresa_id = ?";
-$stmt_productos = $conexion->prepare($sql_productos);
-$stmt_productos->bind_param("i", $empresa_id);
-$stmt_productos->execute();
-$productos = $stmt_productos->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt_productos->close();
+$stmt_productos = $pdo->prepare($sql_productos);
+$stmt_productos->execute([$empresa_id]);
+$productos = $stmt_productos->fetchAll(PDO::FETCH_ASSOC);
 
-$conexion->close();
+} catch (PDOException $e) {
+die("Error de base de datos: " . $e->getMessage());
+} catch (Exception $e) {
+die("Error: " . $e->getMessage());
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
