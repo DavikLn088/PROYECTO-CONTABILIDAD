@@ -6,6 +6,7 @@ if (($_SESSION['intentos_login'] ?? 0) >= 3) {
     exit();
 }
 $_SESSION['intentos_login'] = ($_SESSION['intentos_login'] ?? 0) + 1;
+
 // Validar token CSRF
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     $_SESSION['error_message'] = 'Token de seguridad inválido';
@@ -40,14 +41,16 @@ try {
         
         // Verificar contraseña
         if (password_verify($contrasena, $usuario['password_hash'])) {
-            // Iniciar sesión
+            // Iniciar sesión - Establecer todas las variables necesarias
             $_SESSION['usuario'] = [
                 'id' => $usuario['id'],
                 'correo' => $usuario['correo'],
                 'nombre_completo' => $usuario['nombre_completo'], 
-                'rol' => $usuario['rol'],
-                'ultimo_login' => $usuario['ultimo_login'] // Asegúrate de actualizarlo al hacer login
+                'rol' => $usuario['rol']
             ];
+            
+            // Variables individuales para compatibilidad
+            $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['nombre'] = $usuario['nombre_completo'];
             $_SESSION['correo'] = $usuario['correo'];
             $_SESSION['rol'] = $usuario['rol'];
@@ -60,7 +63,8 @@ try {
             $update_stmt = $pdo->prepare($update_sql);
             $update_stmt->execute([$usuario['id']]);
             
-            header("Location: ../menu_principal.php");
+            // Redirigir a index.php en lugar de menu_principal.php
+            header("Location: ../index.php");
             exit();
         }
     }

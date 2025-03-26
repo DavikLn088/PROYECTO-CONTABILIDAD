@@ -2,27 +2,30 @@
 // facturacion.php
 session_start();
 
-if (!isset($_SESSION['usuario']) || !isset($_SESSION['empresa_id'])) {
-    $_SESSION['error_message'] = 'Debe iniciar sesión y seleccionar una empresa';
+// Verificar autenticación
+if (!isset($_SESSION['usuario_id'])) {
+    $_SESSION['error_message'] = 'Debe iniciar sesión primero';
+    header('Location: login.php');
+    exit;
+}
+
+// Verificar selección de empresa
+if (!isset($_SESSION['empresa_id'])) {
+    $_SESSION['error_message'] = 'Debe seleccionar una empresa primero';
     header('Location: index.php');
     exit;
 }
 
-require_once './php/config.php';
-
 try {
-    // Obtener conexión PDO
     $pdo = conectarDB();
     
-    // Obtener datos de la empresa
-    $empresa_id = $_SESSION['empresa_id'];
-    $sql_empresa = "SELECT * FROM empresas WHERE id = ?";
-    $stmt_empresa = $pdo->prepare($sql_empresa);
-    $stmt_empresa->execute([$empresa_id]);
-    $empresa = $stmt_empresa->fetch(PDO::FETCH_ASSOC);
+    // Obtener datos completos de la empresa seleccionada
+    $stmt = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");
+    $stmt->execute([$_SESSION['empresa_id']]);
+    $empresa = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$empresa) {
-        throw new Exception("Empresa no encontrada");
+        throw new Exception("Empresa no encontrada en la base de datos");
     }
 
     // Procesar el formulario de facturación si se envió
@@ -49,9 +52,13 @@ $stmt_productos->execute([$empresa_id]);
 $productos = $stmt_productos->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-die("Error de base de datos: " . $e->getMessage());
+    $_SESSION['error_message'] = "Error de base de datos: " . $e->getMessage();
+    header('Location: index.php');
+    exit;
 } catch (Exception $e) {
-die("Error: " . $e->getMessage());
+    $_SESSION['error_message'] = $e->getMessage();
+    header('Location: index.php');
+    exit;
 }
 ?>
 
