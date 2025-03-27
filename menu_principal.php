@@ -116,7 +116,7 @@ try {
         .actions a {
             color: #3498db;
             text-decoration: none;
-            margin: 0 5px;
+            margin: 0 0px;
             transition: color 0.3s;
         }
 
@@ -236,6 +236,7 @@ try {
 
 <div class="menu-container">
     <a href="rol_de_pagos.php" class="menu-item">Rol de Pagos</a>
+    <!-- Enlace directo a facturación sin parámetros -->
     <a href="facturacion.php" class="menu-item">Facturación</a>
     <a href="./php/cerrar_sesion.php" class="menu-item btn-logout">Cerrar Sesión</a>
 </div>
