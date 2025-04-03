@@ -65,11 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['empresa_id'])) {
                 $stmt_clientes->execute([$empresa_seleccionada['id']]);
                 $clientes = $stmt_clientes->fetchAll(PDO::FETCH_ASSOC);
 
-                // Obtener productos
-                $sql_productos = "SELECT * FROM productos WHERE empresa_id = ?";
-                $stmt_productos = $pdo->prepare($sql_productos);
-                $stmt_productos->execute([$empresa_seleccionada['id']]);
-                $productos = $stmt_productos->fetchAll(PDO::FETCH_ASSOC);
+// Obtener productos
+$sql_productos = "SELECT id, codigo, descripcion, precio, iva, ice, irbpnr 
+                 FROM productos 
+                 WHERE empresa_id = ?";
+$stmt_productos = $pdo->prepare($sql_productos);
+$stmt_productos->execute([$empresa_seleccionada['id']]);
+$productos = $stmt_productos->fetchAll(PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
                 $_SESSION['error_message'] = "Error al obtener datos: " . $e->getMessage();
             }
@@ -241,6 +243,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['empresa_id'])) {
                 flex-direction: column;
             }
         }
+        .datos-comprador {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.datos-comprador h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    text-transform: uppercase;
+    font-size: 1.1em;
+}
+
+.comprador-tipo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tipo-comprador {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.comprador-warning small {
+    color: #dc3545;
+    font-style: italic;
+}
+
+.busqueda-container {
+    display: flex;
+    gap: 5px;
+}
+
+.busqueda-container input {
+    flex: 1;
+}
+
+.btn-small {
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+
+.btn-small i {
+    margin-right: 0;
+}
+
+/* Estilo para campos de solo lectura */
+input[readonly] {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    cursor: not-allowed;
+}
     </style>
 </head>
 <body>
@@ -279,20 +342,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['empresa_id'])) {
                 <input type="hidden" name="empresa_id" value="<?= $empresa_seleccionada['id'] ?>">
                 
                 <!-- Campos del cliente -->
-                <div class="form-group">
-                    <label for="cliente_id">Cliente:</label>
-                    <select id="cliente_id" name="cliente_id" required>
-                        <option value="">Seleccione un cliente</option>
-                        <?php foreach ($clientes as $cliente): ?>
-                            <option value="<?= $cliente['id'] ?>">
-                                <?= htmlspecialchars($cliente['identificacion'] . ' - ' . $cliente['nombre']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <a href="nuevo_cliente.php?empresa_id=<?= $empresa_seleccionada['id'] ?>" class="btn btn-secondary">
-                        Nuevo Cliente
-                    </a>
-                </div>
+                <div class="datos-comprador">
+    <h3>Datos del comprador</h3>
+    
+    <div class="form-group">
+        <label for="comprador_tipo">Tipo de Comprador:</label>
+        <div class="comprador-tipo-container">
+            <select id="comprador_tipo" name="comprador_tipo" class="tipo-comprador" required>
+                <option value="07">CONSUMIDOR FINAL</option>
+                <option value="04">RUC</option>
+                <option value="05">CÉDULA</option>
+                <option value="06">PASAPORTE</option>
+                <option value="08">IDENTIFICACIÓN DEL EXTERIOR</option>
+            </select>
+            <div class="comprador-warning">
+                <small>Recuerde que a partir de $200 no se puede emitir una factura como Consumidor Final</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="comprador_identificacion">Identificación:</label>
+        <div class="busqueda-container">
+            <input type="text" id="comprador_identificacion" name="comprador_identificacion" placeholder="Buscar...">
+            <button type="button" class="btn btn-small" onclick="buscarCliente()">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            <a href="buscar_cliente.php?empresa_id=<?= $empresa_seleccionada['id'] ?? '' ?>" class="btn btn-small btn-secondary">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="form-group">
+    <label for="comprador_nombre">RAZÓN SOCIAL/APELLIDOS Y NOMBRES:</label>
+    <input type="text" id="comprador_nombre" name="comprador_nombre" readonly>
+</div>
+
+<div class="form-group">
+    <label for="comprador_direccion">DIRECCIÓN COMPRADOR:</label>
+    <input type="text" id="comprador_direccion" name="comprador_direccion" readonly>
+</div>
+
+<div class="form-group">
+    <label for="comprador_telefono">Teléfono:</label>
+    <input type="text" id="comprador_telefono" name="comprador_telefono" readonly>
+</div>
+
+<div class="form-group">
+    <label for="comprador_email">Email:</label>
+    <input type="email" id="comprador_email" name="comprador_email" readonly>
+</div>
+
 
                 <div class="form-group">
                     <label for="fecha_emision">Fecha de Emisión:</label>
@@ -445,7 +546,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['empresa_id'])) {
 
     <script>
 // Variables globales
-let productos = <?= json_encode($productos) ?>;
+let productos = <?= json_encode($productos, JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 let items = [];
 let formaPagoCount = 1;
 let datoAdicionalCount = 1;
@@ -457,12 +558,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Configurar event listeners solo si los elementos existen
     const addProductBtn = document.getElementById('addProductBtn');
-    const productModal = document.getElementById('productModal');
-    
     if (addProductBtn) {
         addProductBtn.addEventListener('click', function() {
+            const productModal = document.getElementById('productModal');
             if (productModal) {
                 productModal.style.display = 'flex';
+            }
+        });
+    }
+
+    const facturaForm = document.getElementById('facturaForm');
+    if (facturaForm) {
+        facturaForm.addEventListener('submit', function(e) {
+            if (items.length === 0) {
+                e.preventDefault();
+                alert('Debe agregar al menos un producto a la factura');
+                return false;
+            }
+            
+            const clienteSelect = document.getElementById('cliente_id');
+            if (!clienteSelect || clienteSelect.value === '') {
+                e.preventDefault();
+                alert('Debe seleccionar un cliente');
+                return false;
             }
         });
     }
@@ -471,6 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeModalBtn = document.querySelector('#productModal .btn-danger');
     if (closeModalBtn) {
         closeModalBtn.addEventListener('click', function() {
+            const productModal = document.getElementById('productModal');
             if (productModal) {
                 productModal.style.display = 'none';
             }
@@ -478,31 +597,113 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Función para seleccionar un producto
-function selectProduct(producto) {
-    // Verificar si el producto ya está en la lista
-    const existe = items.some(item => item.producto_id === producto.id);
+function buscarCliente() {
+    const tipo = document.getElementById('comprador_tipo').value;
+    const identificacion = document.getElementById('comprador_identificacion').value.trim();
     
-    if (!existe) {
-        items.push({
-            producto_id: producto.id,
-            codigo: producto.codigo,
-            descripcion: producto.descripcion,
-            cantidad: 1,
-            precio: producto.precio,
-            iva: producto.iva || 12, // Valor por defecto 12%
-            ice: producto.ice || 0,
-            irbpnr: producto.irbpnr || 0,
-            descuento: 0
-        });
-        renderItems();
-    } else {
-        alert('Este producto ya fue agregado a la factura');
+    if (!identificacion) {
+        alert('Por favor ingrese un número de identificación');
+        return;
     }
-    
-    const productModal = document.getElementById('productModal');
-    if (productModal) {
-        productModal.style.display = 'none';
+
+    // Mostrar indicador de carga
+    const buscarBtn = document.querySelector('.busqueda-container .btn');
+    buscarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+    buscarBtn.disabled = true;
+
+    // Configurar los datos a enviar
+    const datos = {
+        tipo_identificacion: tipo,
+        identificacion: identificacion,
+        empresa_id: <?= $empresa_seleccionada['id'] ?? 0 ?>
+    };
+
+    // Realizar la llamada AJAX
+    fetch('buscar_cliente.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        if (data.encontrado) {
+            document.getElementById('comprador_nombre').value = data.cliente.nombre;
+            document.getElementById('comprador_direccion').value = data.cliente.direccion;
+            document.getElementById('comprador_telefono').value = data.cliente.telefono || '';
+            document.getElementById('comprador_email').value = data.cliente.email || '';
+            document.getElementById('comprador_id').value = data.cliente.id;
+            // Puedes agregar más campos si es necesario
+        } else {
+            
+            alert('Cliente no encontrado. ¿Desea crear uno nuevo?');
+            ['nombre', 'direccion', 'telefono', 'email'].forEach(campo => {
+        document.getElementById(`comprador_${campo}`).value = '';
+    });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al buscar cliente: ' + error.message);
+    })
+    .finally(() => {
+        // Restaurar el botón a su estado original
+        buscarBtn.innerHTML = '<i class="fas fa-search"></i> Buscar';
+        buscarBtn.disabled = false;
+    });
+}
+
+// Función corregida para seleccionar producto
+function selectProduct(producto) {
+    try {
+        // Verificar si el producto es un string JSON y parsearlo
+        if (typeof producto === 'string') {
+            try {
+                producto = JSON.parse(producto.replace(/&quot;/g, '"'));
+            } catch (e) {
+                console.error('Error parsing product:', e);
+                return;
+            }
+        }
+
+        // Verificar si el producto ya está en la lista
+        const existe = items.some(item => item.producto_id == producto.id);
+        
+        if (!existe) {
+            items.push({
+                producto_id: producto.id,
+                codigo: producto.codigo,
+                descripcion: producto.descripcion,
+                cantidad: 1,
+                precio: parseFloat(producto.precio),
+                iva: producto.iva ? 1 : 0, // Convertir a 1 o 0 para la base de datos
+                ice: parseFloat(producto.ice) || 0,
+                irbpnr: parseFloat(producto.irbpnr) || 0,
+                descuento: 0
+            });
+            renderItems();
+            
+            // Cerrar el modal
+            const productModal = document.getElementById('productModal');
+            if (productModal) {
+                productModal.style.display = 'none';
+            }
+        } else {
+            alert('Este producto ya fue agregado a la factura');
+        }
+    } catch (error) {
+        console.error('Error al agregar producto:', error, 'Producto:', producto);
+        alert('Ocurrió un error al agregar el producto: ' + error.message);
     }
 }
 
@@ -529,8 +730,8 @@ function renderItems() {
         
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${item.codigo}</td>
-            <td>${item.descripcion}</td>
+    <td>${item.codigo}</td>
+    <td>${item.descripcion}</td>
             <td><input type="number" name="items[${index}][cantidad]" value="${item.cantidad}" min="1" step="1" onchange="updateItem(${index}, 'cantidad', this.value)"></td>
             <td><input type="number" name="items[${index}][precio]" value="${item.precio.toFixed(2)}" min="0" step="0.01" onchange="updateItem(${index}, 'precio', this.value)"></td>
             <td><input type="number" name="items[${index}][descuento]" value="${item.descuento}" min="0" max="100" step="1" onchange="updateItem(${index}, 'descuento', this.value)">%</td>
