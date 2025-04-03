@@ -1,0 +1,187 @@
+/* style_editar_empresa.css - Estilos para el formulario de edición de empresa */
+
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+    /* Usa esta versión CORREGIDA */
+    background: url('../Images/fondo_factura.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #f0f8ff;
+}
+
+
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #b3e0ff;
+}
+
+/* Encabezados */
+h1 {
+    color: #0077b6;
+    border-bottom: 2px solid #b3e0ff;
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+/* Grupos de formulario */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #0077b6;
+}
+
+.required:after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Campos de formulario */
+input[type="text"],
+input[type="file"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #b3e0ff;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #0077b6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* Grupos de checkbox */
+.checkbox-group {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+    width: auto;
+}
+
+.checkbox-group label {
+    display: inline;
+    font-weight: normal;
+    color: #555;
+}
+
+/* Botones */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #0077b6;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background-color: #005f92;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.back-btn {
+    margin-bottom: 20px;
+    background-color: #6c757d;
+}
+
+.back-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Alertas */
+.alert {
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+.alert-error {
+    background-color: #ffebee;
+    border-color: #f44336;
+    color: #d32f2f;
+}
+
+/* Vista previa del logo */
+.logo-preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 10px;
+    display: block;
+    border: 2px solid #b3e0ff;
+    border-radius: 6px;
+    padding: 5px;
+}
+
+/* Texto pequeño */
+small {
+    display: block;
+    margin-top: 5px;
+    color: #6c757d;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    input[type="text"],
+    input[type="file"],
+    textarea,
+    select {
+        padding: 10px;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 12px;
+    }
+}

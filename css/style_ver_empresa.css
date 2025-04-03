@@ -1,0 +1,230 @@
+/* style_detalles_empresa.css - Versión con cajas anidadas */
+
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+    background: url('../Images/fondo_factura.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #f0f8ff;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid #0077b6; /* Borde exterior azul */
+}
+
+/* Encabezados */
+h1 {
+    color: #0077b6;
+    border-bottom: 2px solid #b3e0ff;
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    text-align: center;
+    border: 2px solid #000; /* Borde negro */
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f0f8ff;
+}
+
+/* Detalles de la empresa - ESTILOS MODIFICADOS CON CAJAS ANIDADAS */
+.empresa-details {
+    margin-bottom: 30px;
+    border: 2px solid #0077b6; /* Borde azul */
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #f9f9f9;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #000; /* Borde negro exterior */
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.detail-row:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detail-label {
+    font-weight: bold;
+    width: 250px;
+    color: #0077b6;
+    font-size: 15px;
+    margin-right: 15px;
+    padding: 8px;
+    border: 1px solid #b3e0ff; /* Borde interior azul claro */
+    border-radius: 3px;
+    background-color: #f0f8ff;
+    display: flex;
+    align-items: center;
+}
+
+.detail-value {
+    flex: 1;
+    color: #333;
+    padding: 8px;
+    background-color: #fff;
+    border: 1px solid #ddd; /* Borde interior gris */
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+}
+
+/* Estilo especial para valores que contienen números/dígitos */
+.detail-value span {
+    display: inline-block;
+    padding: 2px 5px;
+    margin: 1px;
+    border: 1px solid #aaa; /* Borde para cada "elemento" */
+    border-radius: 2px;
+    background-color: #f5f5f5;
+}
+
+/* Logo de la empresa */
+.logo-preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 10px;
+    border: 2px solid #000;
+    border-radius: 6px;
+    padding: 5px;
+    background-color: white;
+    display: block;
+}
+
+/* Botones */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.3s;
+    margin-right: 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    border: 2px solid transparent; /* Borde más grueso */
+}
+
+.btn-primary {
+    background-color: #0077b6;
+    color: white;
+    border-color: #005f92;
+}
+
+.btn-primary:hover {
+    background-color: #005f92;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border-color: #c82333;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    border-color: #218838;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.back-btn {
+    margin-bottom: 20px;
+}
+
+/* Alertas */
+.alert {
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+}
+
+.alert-error {
+    background-color: #ffebee;
+    border-color: #f44336;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+}
+
+/* Grupo de botones */
+.button-group {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    border-top: 2px solid #0077b6;
+    padding-top: 20px;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px;
+    }
+    
+    .detail-label {
+        width: 100%;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #000;
+        padding-bottom: 5px;
+    }
+    
+    .detail-value {
+        padding: 8px 0;
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #000;
+        border-radius: 0;
+        background-color: transparent;
+    }
+    
+    .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
